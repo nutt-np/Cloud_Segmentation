@@ -2,7 +2,6 @@ import os
 import numpy as np
 import rasterio
 import torch
-
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 
@@ -10,18 +9,14 @@ from sklearn.model_selection import train_test_split
 # ============================================================
 # 1. CONFIGURATION
 # ============================================================
-
 DATA_DIR = r"D:\unet\38-Cloud-A-Cloud-Segmentation-Dataset-master\sample_tif"
-
 VAL_SIZE = 0.20
 RANDOM_STATE = 42
 BATCH_SIZE = 4
 
-
 # ============================================================
 # 2. CUSTOM PYTORCH DATASET
 # ============================================================
-
 class CloudDataset(Dataset):
 
     def __init__(self, samples):
@@ -90,8 +85,7 @@ class CloudDataset(Dataset):
 
         image = np.stack(
             normalized_bands,
-            axis=0
-        )
+            axis=0)
 
         # ----------------------------------------------------
         # Read Ground Truth Mask
@@ -113,8 +107,7 @@ class CloudDataset(Dataset):
 
         mask = np.expand_dims(
             mask,
-            axis=0
-        )
+            axis=0)
 
         # ----------------------------------------------------
         # Convert NumPy -> PyTorch Tensor
@@ -122,30 +115,25 @@ class CloudDataset(Dataset):
 
         image = torch.from_numpy(image)
         mask = torch.from_numpy(mask)
-
+        
         return image, mask
-
 
 # ============================================================
 # 3. FIND TIF FILES
 # ============================================================
-
 red_files = []
 green_files = []
 blue_files = []
 nir_files = []
 gt_files = []
 
-
 for filename in os.listdir(DATA_DIR):
-
     if not filename.lower().endswith(".tif"):
         continue
 
     filepath = os.path.join(
         DATA_DIR,
-        filename
-    )
+        filename)
 
     name = filename.lower()
 
@@ -164,7 +152,6 @@ for filename in os.listdir(DATA_DIR):
     elif name.startswith("gt_patch"):
         gt_files.append(filepath)
 
-
 # Sort files
 red_files.sort()
 green_files.sort()
@@ -172,34 +159,26 @@ blue_files.sort()
 nir_files.sort()
 gt_files.sort()
 
-
 # ============================================================
 # 4. CHECK NUMBER OF FILES
 # ============================================================
-
 print("Red   :", len(red_files))
 print("Green :", len(green_files))
 print("Blue  :", len(blue_files))
 print("NIR   :", len(nir_files))
 print("GT    :", len(gt_files))
 
-
 # ============================================================
 # 5. CREATE SAMPLES
 # ============================================================
-
 number_of_samples = min(
     len(red_files),
     len(green_files),
     len(blue_files),
     len(nir_files),
-    len(gt_files)
-)
-
+    len(gt_files))
 
 samples = []
-
-
 for i in range(number_of_samples):
 
     samples.append({
@@ -215,15 +194,12 @@ for i in range(number_of_samples):
         "gt": gt_files[i]
     })
 
-
 print()
 print("Total samples:", len(samples))
-
 
 # ============================================================
 # 6. TRAIN / VALIDATION SPLIT
 # ============================================================
-
 if len(samples) >= 2:
 
     train_samples, val_samples = train_test_split(
@@ -234,7 +210,7 @@ if len(samples) >= 2:
 
         random_state=RANDOM_STATE
     )
-
+    
 else:
 
     print()
@@ -246,59 +222,39 @@ else:
 
     val_samples = []
 
-
 # ============================================================
 # 7. CREATE DATASET
 # ============================================================
-
 train_dataset = CloudDataset(
-    train_samples
-)
-
+    train_samples)
 
 if len(val_samples) > 0:
 
     val_dataset = CloudDataset(
-        val_samples
-    )
+        val_samples)
 
 else:
 
     val_dataset = None
 
-
 # ============================================================
 # 8. CREATE DATALOADER
 # ============================================================
-
 train_loader = DataLoader(
-
     train_dataset,
-
     batch_size=BATCH_SIZE,
-
-    shuffle=True
-)
-
+    shuffle=True)
 
 if val_dataset is not None:
-
     val_loader = DataLoader(
-
         val_dataset,
-
         batch_size=BATCH_SIZE,
-
-        shuffle=False
-    )
-
-
+        shuffle=False)
+    
 # ============================================================
 # 9. TEST DATASET
 # ============================================================
-
 image, mask = train_dataset[0]
-
 
 print()
 print("=" * 50)
@@ -307,48 +263,37 @@ print("=" * 50)
 
 print(
     "Image shape:",
-    image.shape
-)
+    image.shape)
 
 print(
     "Mask shape :",
-    mask.shape
-)
+    mask.shape)
 
 print(
     "Image dtype:",
-    image.dtype
-)
+    image.dtype)
 
 print(
     "Mask dtype :",
-    mask.dtype
-)
+    mask.dtype)
 
 print(
     "Image min  :",
-    image.min().item()
-)
+    image.min().item())
 
 print(
     "Image max  :",
-    image.max().item()
-)
+    image.max().item())
 
 print(
     "Mask values:",
-    torch.unique(mask).tolist()
-)
-
+    torch.unique(mask).tolist())
 
 # ============================================================
 # 10. TEST DATALOADER
 # ============================================================
-
 images, masks = next(
-    iter(train_loader)
-)
-
+    iter(train_loader))
 
 print()
 print("=" * 50)
@@ -357,12 +302,10 @@ print("=" * 50)
 
 print(
     "Batch image shape:",
-    images.shape
-)
+    images.shape)
 
 print(
     "Batch mask shape :",
-    masks.shape
-)
+    masks.shape)
 
 print("=" * 50)
