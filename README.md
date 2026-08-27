@@ -7,16 +7,16 @@ Binary semantic segmentation (cloud / clear) บนภาพดาวเที�
 
 ```
 .
-├── dataset.py      # Task 1: PyTorch Dataset + DataLoader
-├── model.py        # Task 2: U-Net architecture
-├── train.py        # Task 3: training loop (loss, optimizer, early stop, checkpoint)
-├── evaluate.py      # Task 4: evaluation + qualitative visualization
+├── dataset.py       # Task 1: PyTorch Dataset + DataLoader
+├── model.py         # Task 2: U-Net architecture
+├── train.py         # Task 3: training loop
+├── evaluate.py       # Task 4: evaluation + qualitative visualization
 ├── notebooks/
-│   └── eda.ipynb    # EDA: RGB/NIR visualization, class distribution
-├── REPORT.md         # Task 5: รายงานสรุปผล
+│   └── eda.ipynb     # EDA: RGB/NIR visualization, class distribution
+├── README.md
+├── REPORT.md          # Task 5: รายงานสรุปผล
 ├── requirements.txt
-└── outputs/          # ผลลัพธ์จากการรัน (สร้างอัตโนมัติ)
-    ├── best_model.pth
+└── outputs/
     ├── training_curves.png
     ├── metrics.json
     └── predictions/*.png
@@ -30,35 +30,24 @@ pip install -r requirements.txt
 
 ## วิธีโหลด Dataset
 
-**ไม่ commit ตัวข้อมูลไว้ใน repo** เพราะไฟล์ใหญ่เกินไป ให้โหลดแยกดังนี้:
+ไม่ commit ตัวข้อมูลไว้ใน repo ให้โหลดแยกดังนี้:
 
-1. โคลนโค้ด/README ต้นฉบับของ dataset (ไม่ใช่ตัวข้อมูลจริง):
+1. โคลนโค้ด/README ต้นฉบับของ dataset:
    ```bash
    git clone https://github.com/SorourMo/38-Cloud-A-Cloud-Segmentation-Dataset.git
    ```
-2. โหลดตัวข้อมูลจริง (.TIF ทั้งหมด 8,400 train / 9,201 test patches) จาก Kaggle:
+2. โหลดตัวข้อมูลจริง (.TIF ทั้งหมด) จาก Kaggle:
    https://www.kaggle.com/sorour/38cloud-cloud-segmentation-in-satellite-images
-3. แตกไฟล์ให้ได้โครงสร้าง:
-   ```
-   38-Cloud_training/
-       train_red/  train_green/  train_blue/  train_nir/  train_gt/
-   38-Cloud_test/
-       test_red/  test_green/  test_blue/  test_nir/
-   ```
-4. แก้ path `DATA_DIR` / `TRAIN_ROOT` ใน `dataset.py` ให้ชี้ไปยังโฟลเดอร์ที่แตกไว้
+3. แก้ path ข้อมูลใน `dataset.py` ให้ชี้ไปยังโฟลเดอร์ที่แตกไว้
 
 ## วิธีรัน
 
 ```bash
-python dataset.py     # ทดสอบโหลดข้อมูล
-python train.py       # เทรนโมเดล (จะได้ outputs/best_model.pth, training_curves.png)
-python evaluate.py     # ประเมินผล (จะได้ outputs/metrics.json, outputs/predictions/*.png)
+python dataset.py
+python train.py
+python evaluate.py
 ```
 
-เปิด `notebooks/eda.ipynb` เพื่อดู EDA (sample images, class distribution)
+เปิด `notebooks/eda.ipynb` เพื่อดู EDA
 
-## หมายเหตุ
-
-โมเดลรับ input 4 channel (R,G,B,NIR) ขนาด 384×384 และ output เป็น
-probability map ขนาดเท่ากัน (sigmoid, 1 channel) รายละเอียดเหตุผลการเลือก
-สถาปัตยกรรมและผลลัพธ์ดูได้ใน `REPORT.md`
+รายละเอียดสถาปัตยกรรมและผลลัพธ์ดูได้ใน `REPORT.md`
